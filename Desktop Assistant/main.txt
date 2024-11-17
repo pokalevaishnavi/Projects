@@ -1,0 +1,258 @@
+import os
+import speech_recognition as sr
+import openai
+import pyaudio
+import win32com.client
+import webbrowser
+import datetime
+import re
+from config import OPENAI_API_KEY
+import tkinter as tk
+from tkinter import scrolledtext, Entry, Button, END
+
+speaker = win32com.client.Dispatch("SAPI.SpVoice")
+is_speaking = False  # Flag to control speaking process
+
+
+def say(text):
+    global is_speaking
+    is_speaking = True
+    speaker.Speak(text)
+    is_speaking = False
+
+def chat(query, chatStr):
+    openai.api_key = OPENAI_API_KEY
+    messages = [{"role": "user", "content": query}]
+    if chatStr:
+        messages.append({"role": "assistant", "content": chatStr})
+
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=messages,
+        temperature=1,
+        max_tokens=256,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )
+
+    if "choices" in response and response["choices"]:
+        if "message" in response["choices"][0] and "content" in response["choices"][0]["message"]:
+            chatStr += f"{response['choices'][0]['message']['content']}\n"
+            return response["choices"][0]["message"]["content"].strip(), chatStr
+
+
+def chat2(query, chatStr):
+    openai.api_key = OPENAI_API_KEY
+    messages = [{"role": "user", "content": query}]
+    if chatStr:
+        messages.append({"role": "assistant", "content": chatStr})
+
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=messages,
+        temperature=1,
+        max_tokens=256,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )
+
+    if "choices" in response and response["choices"]:
+        if "message" in response["choices"][0] and "content" in response["choices"][0]["message"]:
+            say(response['choices'][0]['message']['content'])
+            chatStr += f"{response['choices'][0]['message']['content']}\n"
+            return response["choices"][0]["message"]["content"].strip(), chatStr
+
+
+def ai(prompt):
+    openai.api_key = OPENAI_API_KEY
+    text = f"OpenAI response for Prompt: {prompt} \n*********************\n\n"
+
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=1,
+            max_tokens=256,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+
+        if "choices" in response and response["choices"]:
+            if "message" in response["choices"][0] and "content" in response["choices"][0]["message"]:
+                text += response["choices"][0]["message"]["content"].strip()
+                save_response(prompt, text)
+                if len(response["choices"][0]["message"]["content"].strip()) < 150:
+                    say(response["choices"][0]["message"]["content"].strip())
+                else:
+                    say("Done! Look into responses please")
+            else:
+                print("Error: 'message' key or 'content' key not found in response")
+        else:
+            print("Error: 'choices' key not found or empty in response")
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        say("Sorry, I encountered an error. Please try again.")
+
+
+def save_response(prompt, text):
+    index = prompt.lower().find("using ai")
+    if index != -1:
+        filename = prompt[index + len("using ai"):].strip()
+    else:
+        filename = "response"
+
+    filename = ''.join(char for char in filename if char.isalnum())[:20]
+
+    if not os.path.exists("Responses"):
+        os.makedirs("Responses")
+
+    with open(os.path.join("Responses", f"{filename}.txt"), "w") as f:
+        f.write(text)
+
+
+def takeCommand():
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        audio = r.listen(source)
+        try:
+            print("Recognizing..")
+            query = r.recognize_google(audio, language="en-in")
+            print(f"User said: {query}")
+            print(f"Debug: Query after recognition: {query.lower()}")
+            return query.lower()
+        except Exception as e:
+            return "Some error occurred. Sorry from Assistant"
+
+
+def open_website(query):
+    sites = {
+        "youtube": "https://youtube.com",
+        "google": "https://google.com",
+        "wikipedia": "https://wikipedia.com"
+    }
+
+    for site in sites:
+        if site in query:
+            say(f"Opening {site}")
+            webbrowser.open(sites[site])
+            return True
+    return False
+
+
+def open_app(query):
+    apps = {
+        "vs code": "C:\\Users\\Dell\\Desktop\\Visual Studio Code.lnk",
+        "notepad": "C:\\Windows\\notepad.exe",
+        "microsoft word": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Word.lnk",
+        "microsoft powerpoint": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\PowerPoint.lnk",
+        "microsoft excel": "C:\\ProgramData\\Microsoft\\Windows\\Start Menu\\Programs\\Excel.lnk",
+        "oracle virtual box": "C:\\Users\\Public\\Desktop\\Oracle VM VirtualBox.lnk",
+        "zoom": "C:\\Users\\Dell\\Desktop\\Zoom.lnk",
+        "dosbox": "C:\\Users\\Public\\Desktop\\DOSBox 0.74-3.lnk",
+        "turbo c": "C:\\Users\\Dell\\Desktop\\TurboC++ for Windows 7.lnk"
+    }
+
+    for app in apps:
+        if app in query:
+            say(f"Opening {app}")
+            os.startfile(apps[app])
+            return True
+    return False
+
+
+def chat_box():
+    window = tk.Tk()
+    window.title("Voice Assistant")
+    window.geometry("600x514")
+    # window.configure(bg="#000000")
+
+    lbl = tk.Label(window, text="Ask Assistant:")
+    lbl.grid(column=0, row=0)
+
+    txt = Entry(window, width=68)
+    txt.grid(column=1, row=0)
+
+    txt_output = scrolledtext.ScrolledText(window, width=72, height=30)
+    txt_output.grid(column=0, row=1, columnspan=4)
+
+    def clicked():
+        user_input = txt.get()
+        txt.delete(0, END)
+        output_text, chatStr = chat(user_input, "")
+        if output_text:
+            txt_output.insert(END, f"User: {user_input}\nAssistant: {output_text}\n")
+
+    def clear_text():
+        txt_output.delete(1.0, END)
+
+    def voice_command():
+        r = sr.Recognizer()
+        with sr.Microphone() as source:
+            audio = r.listen(source)
+            try:
+                print("Recognizing..")
+                query = r.recognize_google(audio, language="en-in")
+                print(f"User said: {query}")
+                txt.insert(END, query)
+                output_text, chatStr = chat(query, "")
+                if output_text:
+                    txt_output.insert(END, f"User: {query}\nAssistant: {output_text}\n")
+            except Exception as e:
+                txt_output.insert(END, "Some error occurred. Sorry from Assistant\n")
+
+    btn = Button(window, text="Ask", command=clicked)
+    btn.grid(column=2, row=0)
+
+    btn_clear = Button(window, text="Clear", command=clear_text)
+    btn_clear.grid(column=3, row=0)
+
+    btn_voice = Button(window, text="Voice Command", command=voice_command)
+    btn_voice.grid(column=0, row=0)
+
+    window.mainloop()
+
+
+def main():
+    say("Hello")
+    while True:
+        print("Listening...")
+        query = takeCommand()
+
+        if "open music" in query:
+            music_path = "C:\\Users\\Dell\\Music\\Mera-man.mp3"
+            say("Opening music")
+            os.startfile(music_path)
+
+        elif "the time" in query:
+            current_time = datetime.datetime.now().strftime("%H:%M")
+            say(f"The time is {current_time}")
+
+        elif "open" in query and open_website(query):
+            continue
+
+        elif "open" in query and open_app(query):
+            continue
+
+        elif "using ai" in query:
+            ai(query)
+
+        elif "open chat box" in query:
+            chat_box()
+
+        elif "quit chat".lower() in query:
+            exit()
+
+        elif "reset chat" in query:
+            chatStr = ""
+
+        else:
+            print("Chatting...")
+            chat2(query, "")
+
+
+if __name__ == '__main__':
+    main()
