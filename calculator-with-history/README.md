@@ -1,17 +1,21 @@
-Simple Multi-Input Calculator with History
+# Calculator with History
 
-A beginner-friendly web calculator built with Python and Streamlit. Supports multiple inputs, parentheses, powers (^), and square roots (√), with a calculation history feature.
+A **beginner-friendly web app** built with Python and Streamlit that functions as a **multi-input calculator** with **calculation history**. Perfect for learning Python, building interactive apps, and handling user input.
 
-Live Demo: [Calculator with History](https://calculator-with-history.streamlit.app/)
+**Live Demo:** [Calculator with History](https://calculator-with-history.streamlit.app/)
 
-Features:
+---
 
-Multi-step calculations like a normal calculator
+## Features
+- Supports multiple inputs like a regular calculator  
+- Handles parentheses, powers (`^`), and square roots (`√`)  
+- Saves and displays calculation history  
+- Clear history anytime  
+- Beginner-friendly interface  
 
-Save and view past calculations
+---
 
-Clear history anytime
-
-Simple and intuitive interface
-
-Tech Stack: Python, Streamlit
+## Example Calculation
+(2 + 3) * 4 = 20
+√16 + 2 = 6
+2^3 + 5 = 13
