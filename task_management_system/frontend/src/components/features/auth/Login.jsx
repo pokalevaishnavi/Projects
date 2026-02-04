@@ -1,56 +1,56 @@
 import React, { useState } from "react";
-import API from "../../../services/api";
-import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../../services/authService";
 
-function Login() {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  const [error, setError] = useState("");
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+
     try {
-      const res = await API.post("/auth/login", {
-        email,
-        password
-      });
+      const data = await loginUser(email, password);
 
-      localStorage.setItem("token", res.data.access_token);
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("role", "admin"); // temporary (later from backend)
 
-      const payload = JSON.parse(atob(res.data.access_token.split(".")[1]));
-
-      payload.role === "admin"
-        ? navigate("/admin")
-        : navigate("/employee");
-
+      alert("Login successful");
     } catch (err) {
-      alert("Invalid credentials");
+      setError("Invalid email or password");
     }
   };
 
   return (
-    <div>
+    <div style={{ maxWidth: "400px", margin: "100px auto" }}>
       <h2>Login</h2>
 
-      <input
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+      <form onSubmit={handleLogin}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <br /><br />
 
-      <br />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <br /><br />
 
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <button type="submit">Login</button>
+      </form>
 
-      <br />
-
-      <button onClick={handleLogin}>Login</button>
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
-}
+};
 
 export default Login;

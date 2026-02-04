@@ -1,14 +1,14 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./features/auth/Login";
+import Login from "./components/features/auth/Login";
+import TaskList from "./components/features/tasks/TaskList";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-      </Routes>
-    </BrowserRouter>
+    <div>
+      <Login />
+      <hr />
+      <TaskList />
+    </div>
   );
 }
 
