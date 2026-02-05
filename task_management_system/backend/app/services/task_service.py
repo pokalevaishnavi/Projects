@@ -2,6 +2,7 @@ from app.dao.task_dao import (
     create_task,
     get_all_tasks,
     get_tasks_by_user,
+    get_task_by_id,
     update_task_status,
     delete_task
 )
@@ -41,9 +42,26 @@ def fetch_tasks_service(db):
 
 
 
+VALID_STATUS_FLOW = {
+    "Pending": "In Progress",
+    "In Progress": "Completed"
+}
+
 def update_task_status_service(db, task_id: int, new_status: str, token_data):
-    if new_status not in ["Pending", "In Progress", "Completed"]:
-        raise Exception("Invalid status")
+    task = get_task_by_id(db, task_id)
+
+    if not task:
+        raise Exception("Task not found")
+
+    current_status = task["status"]
+
+    if current_status not in VALID_STATUS_FLOW:
+        raise Exception("Task already completed")
+
+    if VALID_STATUS_FLOW[current_status] != new_status:
+        raise Exception(
+            f"Invalid status transition: {current_status} → {new_status}"
+        )
 
     return update_task_status(db, task_id, new_status)
 

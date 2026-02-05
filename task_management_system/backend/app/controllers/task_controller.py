@@ -31,16 +31,15 @@ def create_task(
     return create_task_service(db, task)
 
 
-
 @router.get("/")
 def get_tasks(
     db: Session = Depends(get_db),
     token_data: dict = Depends(verify_token)
 ):
-    return fetch_tasks_service(db)
+    return fetch_tasks_service(db, token_data)
 
 
-@router.put("/{task_id}/status")
+@router.patch("/{task_id}/status")
 def update_status(
     task_id: int,
     status: TaskUpdateStatus,
@@ -55,7 +54,11 @@ def update_status(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.delete("/{task_id}", dependencies=[Depends(admin_required)])
-def delete_task(task_id: int, db: Session = Depends(get_db)):
+@router.delete("/{task_id}")
+def delete_task(
+    task_id: int,
+    db: Session = Depends(get_db),
+    token_data: dict = Depends(admin_required)
+):
     delete_task_service(db, task_id)
     return {"message": "Task deleted successfully"}

@@ -14,6 +14,11 @@ GET_TASKS_BY_USER = text("""
 SELECT * FROM tasks WHERE user_id = :user_id;
 """)
 
+GET_TASK_BY_ID = text("""
+SELECT * FROM tasks WHERE id = :task_id;
+""")
+
+
 UPDATE_TASK_STATUS = text("""
 UPDATE tasks
 SET status = :status

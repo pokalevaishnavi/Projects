@@ -3,6 +3,7 @@ from app.queries.task_queries import (
     CREATE_TASK,
     GET_ALL_TASKS,
     GET_TASKS_BY_USER,
+    GET_TASK_BY_ID,
     UPDATE_TASK_STATUS,
     DELETE_TASK
 )
@@ -23,6 +24,12 @@ def get_all_tasks(db: Session):
 def get_tasks_by_user(db: Session, user_id: int):
     result = db.execute(GET_TASKS_BY_USER, {"user_id": user_id})
     return [dict(row._mapping) for row in result.fetchall()]
+
+def get_task_by_id(db: Session, task_id: int):
+    result = db.execute(GET_TASK_BY_ID, {"task_id": task_id})
+    row = result.fetchone()
+    return dict(row._mapping) if row else None
+
 
 
 def update_task_status(db: Session, task_id: int, status: str):
