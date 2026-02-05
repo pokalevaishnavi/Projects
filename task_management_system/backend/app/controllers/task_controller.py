@@ -37,7 +37,7 @@ def get_tasks(
     db: Session = Depends(get_db),
     token_data: dict = Depends(verify_token)
 ):
-    return fetch_tasks_service(db, token_data)
+    return fetch_tasks_service(db)
 
 
 @router.put("/{task_id}/status")
