@@ -1,24 +1,26 @@
-CREATE_TASK = """
-INSERT INTO tasks (title, description, assigned_user, status, due_date, created_date)
-VALUES (:title, :description, :assigned_user, 'Pending', :due_date, NOW())
+from sqlalchemy import text
+
+CREATE_TASK = text("""
+INSERT INTO tasks (title, description, status, user_id)
+VALUES (:title, :description, 'Pending', :user_id)
 RETURNING *;
-"""
+""")
 
-GET_ALL_TASKS = """
+GET_ALL_TASKS = text("""
 SELECT * FROM tasks;
-"""
+""")
 
-GET_TASKS_BY_USER = """
-SELECT * FROM tasks WHERE assigned_user = :user_id;
-"""
+GET_TASKS_BY_USER = text("""
+SELECT * FROM tasks WHERE user_id = :user_id;
+""")
 
-UPDATE_TASK_STATUS = """
+UPDATE_TASK_STATUS = text("""
 UPDATE tasks
 SET status = :status
 WHERE id = :task_id
 RETURNING *;
-"""
+""")
 
-DELETE_TASK = """
+DELETE_TASK = text("""
 DELETE FROM tasks WHERE id = :task_id;
-"""
+""")

@@ -22,12 +22,14 @@ def get_db():
         db.close()
 
 
-@router.post("/", dependencies=[Depends(admin_required)])
+@router.post("/")
 def create_task(
     task: TaskCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    token_data: dict = Depends(admin_required)
 ):
     return create_task_service(db, task)
+
 
 
 @router.get("/")

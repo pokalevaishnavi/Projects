@@ -13,7 +13,10 @@ VALID_STATUS_FLOW = {
 
 
 def create_task_service(db, task):
-    return create_task(db, task.dict())
+    task_data = task.dict()
+    task_data["status"] = "Pending"
+    return create_task(db, task_data)
+
 
 
 def fetch_tasks_service(db, token_data):
@@ -21,9 +24,20 @@ def fetch_tasks_service(db, token_data):
     user_id = token_data.get("user_id")
 
     if role == "admin":
-        return get_all_tasks(db)
+        tasks = get_all_tasks(db)
     else:
-        return get_tasks_by_user(db, user_id)
+        tasks = get_tasks_by_user(db, user_id)
+
+    return [
+        {
+            "id": task.id,
+            "title": task.title,
+            "description": task.description,
+            "status": task.status
+        }
+        for task in tasks
+    ]
+
 
 
 def update_task_status_service(db, task_id: int, new_status: str, token_data):

@@ -11,17 +11,18 @@ from app.queries.task_queries import (
 def create_task(db: Session, task_data: dict):
     result = db.execute(CREATE_TASK, task_data)
     db.commit()
-    return result.fetchone()
+    row = result.fetchone()
+    return dict(row._mapping) if row else None
 
 
 def get_all_tasks(db: Session):
     result = db.execute(GET_ALL_TASKS)
-    return result.fetchall()
+    return [dict(row._mapping) for row in result.fetchall()]
 
 
 def get_tasks_by_user(db: Session, user_id: int):
     result = db.execute(GET_TASKS_BY_USER, {"user_id": user_id})
-    return result.fetchall()
+    return [dict(row._mapping) for row in result.fetchall()]
 
 
 def update_task_status(db: Session, task_id: int, status: str):
@@ -30,7 +31,8 @@ def update_task_status(db: Session, task_id: int, status: str):
         {"task_id": task_id, "status": status}
     )
     db.commit()
-    return result.fetchone()
+    row = result.fetchone()
+    return dict(row._mapping) if row else None
 
 
 def delete_task(db: Session, task_id: int):
