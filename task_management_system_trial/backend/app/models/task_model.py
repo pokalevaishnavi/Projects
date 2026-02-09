@@ -9,4 +9,8 @@ class Task(Base):
     description = Column(String)
     status = Column(String, default="Pending")
     due_date = Column(Date)
-    assigned_user = Column(Integer, ForeignKey("users.id"))
+    assigned_user = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=True 
+)

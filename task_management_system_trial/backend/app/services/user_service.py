@@ -1,4 +1,5 @@
-from app.dao.user_dao import get_all_users
+from sqlalchemy.orm import Session
+from app.models.user_model import User
 
-def fetch_users_service(db):
-    return get_all_users(db)
+def fetch_users_service(db: Session):
+    return db.query(User).all()

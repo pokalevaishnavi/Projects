@@ -42,7 +42,10 @@ const TaskCard = ({ task, onUpdated }) => {
   const saveAssignment = async () => {
     if (isUpdatingAssignment) return;
 
-    let idToSave = null;
+    let payload = {
+      user_id: null,
+      due_date: dueDate || null,
+    };
 
     if (assigneeId !== "") {
       const numericId = Number(assigneeId);
@@ -52,23 +55,19 @@ const TaskCard = ({ task, onUpdated }) => {
         return;
       }
 
-      idToSave = numericId;
+      payload.user_id = numericId;
     }
 
     try {
       setIsUpdatingAssignment(true);
-
-      await updateTaskAssignment(task.id, {
-        user_id: idToSave,
-        due_date: dueDate || null,
-      });
-
+      await updateTaskAssignment(task.id, payload);
       if (onUpdated) await onUpdated();
       setIsEditingAssignment(false);
     } finally {
       setIsUpdatingAssignment(false);
     }
   };
+
 
   const removeTask = async () => {
     if (isDeleting) return;
@@ -145,26 +144,18 @@ const TaskCard = ({ task, onUpdated }) => {
           {/* dropdown */}
           <select
             className="w-24 rounded-lg border border-slate-200 px-2 py-1 text-[11px]"
-            onChange={(e) =>
-              setAssigneeId(e.target.value === "NA" ? "" : e.target.value)
-            }
-            value={assigneeId === "" ? "NA" : assigneeId}
+            value={assigneeId}
+            onChange={(e) => setAssigneeId(e.target.value)}
           >
-            <option value="NA">NA</option>
+            <option value="">NA</option>
             {users.map((u) => (
               <option key={u.id} value={u.id}>
-                {u.id}
+                User {u.id}
               </option>
             ))}
           </select>
-          {/* manual entry */}
-          <input
-            className="w-20 rounded-lg border border-slate-200 px-2 py-1 text-[11px]"
-            placeholder="User ID"
-            value={assigneeId}
-            onChange={(e) => setAssigneeId(e.target.value)}
-          />
 
+        
           <button
             type="button"
             onClick={saveAssignment}

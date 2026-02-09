@@ -43,10 +43,14 @@ def update_task_status(db: Session, task_id: int, status: str):
     return dict(row._mapping) if row else None
 
 
-def update_task_assignment(db: Session, task_id: int, user_id: int, due_date):
+def update_task_assignment(db: Session, task_id, user_id, due_date):
     result = db.execute(
         UPDATE_TASK_ASSIGNMENT,
-        {"task_id": task_id, "user_id": user_id, "due_date": due_date},
+        {
+            "task_id": task_id,
+            "user_id": user_id,  
+            "due_date": due_date
+        }
     )
     db.commit()
     row = result.fetchone()

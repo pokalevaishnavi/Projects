@@ -77,8 +77,12 @@ def update_assignment(
 ):
     try:
         return update_task_assignment_service(
-            db, task_id, payload.user_id, payload.due_date
+            db=db,
+            task_id=task_id,
+            user_id=payload.user_id,
+            due_date=payload.due_date
         )
+
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 

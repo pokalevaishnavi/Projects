@@ -12,7 +12,7 @@ const TaskForm = ({ onCreated }) => {
     if (!title.trim() || isSubmitting) return;
 
     const userIdToUse =
-      assigneeId.trim() !== "" ? Number(assigneeId.trim()) : 1;
+      assigneeId.trim() !== "" ? Number(assigneeId.trim()) : 0;
     try {
       setIsSubmitting(true);
       await createTask({

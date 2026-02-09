@@ -2,9 +2,16 @@ from sqlalchemy import text
 
 CREATE_TASK = text("""
 INSERT INTO tasks (title, description, status, user_id, due_date)
-VALUES (:title, :description, 'Backlog', :user_id, :due_date)
+VALUES (
+    :title,
+    :description,
+    'Backlog',
+    NULLIF(:user_id, 0),
+    :due_date
+)
 RETURNING *;
 """)
+
 
 GET_ALL_TASKS = text("""
 SELECT * FROM tasks;

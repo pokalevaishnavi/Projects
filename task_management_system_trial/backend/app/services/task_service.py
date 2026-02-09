@@ -17,6 +17,7 @@ def create_task_service(db, task):
     """Create a new task that always starts in Backlog."""
     task_data = task.model_dump() 
     task_data["status"] = "Backlog"
+    print("\nTask Data: ",task_data)
     return create_task(db, task_data)
 
 
@@ -47,11 +48,8 @@ def update_task_assignment_service(db, task_id: int, user_id: int | None, due_da
     if not task:
         raise Exception("Task not found")
 
-    # convert NA to default unassigned user (1)
-    if user_id is None:
-        user_id = 1
-
     return update_task_assignment(db, task_id, user_id, due_date)
+
 
 def delete_task_service(db, task_id: int):
     delete_task(db, task_id)
