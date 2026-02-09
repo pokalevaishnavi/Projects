@@ -27,7 +27,7 @@ const TaskBoard = () => {
   const done = tasks.filter((t) => t.status === "Done");
 
   return (
-    <div className="flex h-full flex-col bg-slate-50">
+    <div className="flex h-screen flex-col overflow-hidden bg-slate-50">
       
       {/* Header */}
       <div className="px-6 pt-6 pb-4 border-b border-slate-200 bg-white/80 backdrop-blur">
@@ -56,12 +56,14 @@ const TaskBoard = () => {
       </div>
 
       {/* Columns container */}
-      <div className="flex-1 overflow-x-auto">
-        <div className="flex h-full min-w-max gap-5 px-6 pt-4 pb-14">
-          <Column title="Backlog" count={backlog.length} accent="border-slate-300 bg-slate-50" tasks={backlog} onRefresh={loadTasks}/>
-          <Column title="In Progress" count={inProgress.length} accent="border-amber-300 bg-amber-50" tasks={inProgress} onRefresh={loadTasks}/>
-          <Column title="Review" count={review.length} accent="border-sky-300 bg-sky-50" tasks={review} onRefresh={loadTasks}/>
-          <Column title="Done" count={done.length} accent="border-emerald-300 bg-emerald-50" tasks={done} onRefresh={loadTasks}/>
+       <div className="flex-1 overflow-hidden">
+        <div className="h-full overflow-x-auto overflow-y-hidden pb-2">
+          <div className="flex w-max h-full gap-5 px-6 pt-4 pb-1">
+            <Column title="Backlog" count={backlog.length} accent="border-slate-300 bg-slate-50" tasks={backlog} onRefresh={loadTasks}/>
+            <Column title="In Progress" count={inProgress.length} accent="border-amber-300 bg-amber-50" tasks={inProgress} onRefresh={loadTasks}/>
+            <Column title="Review" count={review.length} accent="border-sky-300 bg-sky-50" tasks={review} onRefresh={loadTasks}/>
+            <Column title="Done" count={done.length} accent="border-emerald-300 bg-emerald-50" tasks={done} onRefresh={loadTasks}/>
+          </div>
         </div>
       </div>
 
@@ -79,7 +81,7 @@ const TaskBoard = () => {
 
 const Column = ({ title, count, accent, tasks, onRefresh }) => {
   return (
-    <div className={`flex h-full w-80 flex-col rounded-2xl border p-4 shadow-sm ${accent}`}>
+    <div className={`flex h-full min-w-[320px] flex-1 flex-col rounded-2xl border p-4 shadow-sm ${accent}`}>
       
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-sm font-semibold text-slate-800">{title}</h2>

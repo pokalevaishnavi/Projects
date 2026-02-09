@@ -8,7 +8,7 @@ const Dashboard = () => {
     <div className="flex h-screen bg-slate-100">
       {/* <Sidebar /> */}
 
-      <div className="flex flex-1 flex-col overflow-hidden bg-indigo-600 shadow-inner">
+      <div className="flex flex-1 flex-col overflow-auto bg-slate-50">
         <Topbar />
         <TaskBoard />
       </div>
