@@ -14,8 +14,11 @@ RETURNING *;
 
 
 GET_ALL_TASKS = text("""
-SELECT * FROM tasks;
+SELECT t.*, u.name AS user_name
+FROM tasks t
+LEFT JOIN users u ON t.user_id = u.id;
 """)
+
 
 GET_TASKS_BY_USER = text("""
 SELECT * FROM tasks WHERE user_id = :user_id;
